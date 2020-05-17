@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView, TokenRefreshView, TokenVerifyView
 )
-from .views import EntityAPIView, ItemAPIView
+from .views import EntityAPIView, ItemAPIView, OrderAPIView
 
 
 urlpatterns = [
@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/items/', ItemAPIView.as_view()),
     path('api/entities/', EntityAPIView.as_view()),
+    path('api/orders/', OrderAPIView.as_view()),
 ]
