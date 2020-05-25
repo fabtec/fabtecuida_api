@@ -25,6 +25,7 @@ SECRET_KEY = '%k50o54!)s+n!#a1yc1-grh7l7+ahhm0xy5oh(#f7&129qtl6z'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# TODO check right way of setup
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '52.91.182.173']
 
 
@@ -91,10 +92,12 @@ WSGI_APPLICATION = 'fabtecuida_api.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 if os.environ.get('DATABASE_URL', ''):
+    # dokku env
     DATABASES = {
         'default': dj_database_url.config()
     }
 else:
+    # local env
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -142,7 +145,8 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
-# Extra places for collectstatic to find static files.
+# Extra places for collectstatic to find static files
+# needed for dokku env (points to `static` root folder)
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
