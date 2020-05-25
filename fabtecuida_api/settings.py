@@ -25,7 +25,7 @@ SECRET_KEY = '%k50o54!)s+n!#a1yc1-grh7l7+ahhm0xy5oh(#f7&129qtl6z'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# TODO check right way of setup
+# TODO check right way of setup - needed for dokku env
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '52.91.182.173']
 
 
@@ -53,7 +53,7 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
-    # Simplified static file serving.
+    # Simplified static file serving - needed for dokku env
     # https://warehouse.python.org/project/whitenoise/
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -146,7 +146,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files
-# needed for dokku env (points to `static` root folder)
+# points to `static` root folder - needed for dokku env
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
