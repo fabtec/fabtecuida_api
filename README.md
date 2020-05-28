@@ -10,7 +10,7 @@ virtualenv -p python3 venv
 pip install -r requirements.txt
 
 python manage.py migrate
-python manage.py createsuperuser --email admin@example.com --username admin
+python manage.py createsuperuser --email admin --username admin
 
 python manage.py runserver
 ```
