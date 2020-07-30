@@ -65,7 +65,7 @@ class BaseOrderSuppliedItemSerializer(serializers.ModelSerializer):
 class BaseOrderSerializer(serializers.ModelSerializer):
 	# order_requested_item = OrderRequestedItemSerializer(source='getOrdersRequested', many=True)
 	# order_supplied_item  = OrderSuppliedItemSerializer(source='getOrdersSupplied', many=True)
-	# date      = serializers.DateTimeField(source='created_at')
+	date      = serializers.DateTimeField(source='created_at')
 	requester = UserSerializer()
 	entity    = EntitySerializer()
 	class Meta:
@@ -74,9 +74,10 @@ class BaseOrderSerializer(serializers.ModelSerializer):
 			'id',
 			'requester',
 			'entity',
+			'status',
 			# 'order_requested_item',
 			# 'order_supplied_item',
-			'created_at',
+			'date',
 			'updated_at'
 		]
 
