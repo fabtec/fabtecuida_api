@@ -36,7 +36,33 @@ class EntitySerializer(serializers.ModelSerializer):
 # 		model = OrderRequestedItem
 # 		fields = '__all__'
 
-class OrderSerializer(serializers.ModelSerializer):
+class BaseOrderRequestedItemSerializer(serializers.ModelSerializer):
+	item  = ItemSerializer()
+	date  = serializers.DateTimeField(source='created_at')
+	class Meta:
+		model = OrderRequestedItem
+		fields = [
+			'item',
+			'status',
+			'quantity',
+			'date',
+			'updated_at',
+		]
+
+class BaseOrderSuppliedItemSerializer(serializers.ModelSerializer):
+	item  = ItemSerializer()
+	date  = serializers.DateTimeField(source='created_at')
+	class Meta:
+		model = OrderRequestedItem
+		fields = [
+			'item',
+			'status',
+			'quantity',
+			'date',
+			'updated_at',
+		]
+
+class BaseOrderSerializer(serializers.ModelSerializer):
 	# order_requested_item = OrderRequestedItemSerializer(source='getOrdersRequested', many=True)
 	# order_supplied_item  = OrderSuppliedItemSerializer(source='getOrdersSupplied', many=True)
 	# date      = serializers.DateTimeField(source='created_at')
@@ -53,6 +79,25 @@ class OrderSerializer(serializers.ModelSerializer):
 			'created_at',
 			'updated_at'
 		]
+
+class OrderSerializer(serializers.ModelSerializer):
+	order_requested_item = BaseOrderRequestedItemSerializer(source='getOrdersRequested', many=True)
+	order_supplied_item  = BaseOrderSuppliedItemSerializer(source='getOrdersSupplied', many=True)
+	# date      = serializers.DateTimeField(source='created_at')
+	requester = UserSerializer()
+	entity    = EntitySerializer()
+	class Meta:
+		model = Order
+		fields = [
+			'id',
+			'requester',
+			'entity',
+			'order_requested_item',
+			'order_supplied_item',
+			'created_at',
+			'updated_at'
+		]
+
 class CreateOrderSerializer(serializers.ModelSerializer):
 	
 	class Meta:
@@ -60,7 +105,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 class OrderRequestedItemSerializer(serializers.ModelSerializer):
-	order = OrderSerializer()
+	order = BaseOrderSerializer()
 	item  = ItemSerializer()
 	date  = serializers.DateTimeField(source='created_at')
 	class Meta:

@@ -39,7 +39,7 @@ class Order(models.Model):
         return OrderSuppliedItem.objects.filter(order=self)
 
 class OrderRequestedItem(models.Model):
-    order      = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order      = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_requested')
     item       = models.ForeignKey(Item, on_delete=models.CASCADE)
     status     = models.CharField(max_length=255, default="PENDING") #PENDING - DONE - INPROGRESS (POR FRONT)
     quantity   = models.IntegerField()
@@ -47,7 +47,7 @@ class OrderRequestedItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class OrderSuppliedItem(models.Model):
-    order                     = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order                     = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_supplied')
     supplier                  = models.ForeignKey(User, on_delete=models.CASCADE)
     item                      = models.ForeignKey(Item, on_delete=models.CASCADE)
     status                    = models.CharField(max_length=255)
