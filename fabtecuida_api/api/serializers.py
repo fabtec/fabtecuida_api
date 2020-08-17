@@ -23,7 +23,7 @@ class ItemSerializer(serializers.ModelSerializer):
 class EntitySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Entity
-		fields = ['id', 'name', 'location']
+		fields = ['id', 'name', 'location', 'manager']
 
 #FILTRO DE ORDENES 1)ENTIDADES__ID, 2)STATUS, 3)QUANTITY lt210 y gt (>=), 4)TIPO
 #localhost:8000/api/orders/?entity=1203&status="INPROGRESS"&quantity=lt210&type="SUPPLIED"
@@ -84,18 +84,19 @@ class BaseOrderSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
 	order_requested_item = BaseOrderRequestedItemSerializer(source='getOrdersRequested', many=True)
 	order_supplied_item  = BaseOrderSuppliedItemSerializer(source='getOrdersSupplied', many=True)
-	# date      = serializers.DateTimeField(source='created_at')
-	requester = UserSerializer()
-	entity    = EntitySerializer()
+	date                 = serializers.DateTimeField(source='created_at')
+	requester            = UserSerializer()
+	entity               = EntitySerializer()
 	class Meta:
-		model = Order
+		model  = Order
 		fields = [
 			'id',
 			'requester',
 			'entity',
 			'order_requested_item',
 			'order_supplied_item',
-			'created_at',
+			'date',
+			'status',
 			'updated_at'
 		]
 
@@ -132,6 +133,8 @@ class OrderSuppliedItemSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 class SupplierInventorySerializer(serializers.ModelSerializer):
+	supplier = EntitySerializer()
+	item     = ItemSerializer()
 	class Meta:
 		model = SupplierInventory
 		fields = '__all__'

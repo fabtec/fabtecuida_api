@@ -12,9 +12,9 @@ class Item(models.Model):
         return self.name
 
 class Entity(models.Model):
-   
     name       = models.CharField(max_length=255)
     location   = models.CharField(max_length=512)
+    manager    = models.ManyToManyField(User)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -49,7 +49,7 @@ class OrderRequestedItem(models.Model):
 
 class OrderSuppliedItem(models.Model):
     order                     = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_supplied')
-    supplier                  = models.ForeignKey(User, on_delete=models.CASCADE)
+    supplier                  = models.ForeignKey(Entity, on_delete=models.CASCADE)
     item                      = models.ForeignKey(Item, on_delete=models.CASCADE)
     status                    = models.CharField(max_length=255)
     external_shipment_id      = models.TextField()
@@ -59,9 +59,9 @@ class OrderSuppliedItem(models.Model):
     updated_at                = models.DateTimeField(auto_now=True)
 
 class SupplierInventory(models.Model):
-    supplier      = models.ForeignKey(User, on_delete=models.CASCADE)
+    supplier      = models.ForeignKey(Entity, on_delete=models.CASCADE)
     item          = models.ForeignKey(Item, on_delete=models.CASCADE)
-    origin_supply = models.ForeignKey(OrderSuppliedItem, on_delete=models.CASCADE)
+    #origin_supply = models.ForeignKey(OrderSuppliedItem, on_delete=models.CASCADE)
     quantity      = models.IntegerField()
     created_at    = models.DateTimeField(auto_now_add=True)
     updated_at    = models.DateTimeField(auto_now=True)

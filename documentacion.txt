@@ -1,0 +1,39 @@
+#crear entidad
+{
+    "id": 1,
+    "name": "asd",
+    "location": "123123",
+    "manager": [
+        1
+    ]
+}
+
+#crear orden
+{
+    "requester": 1,
+    "entity":1
+}
+
+#crear item
+{
+    "name": "Mascarillas",
+    "description": "asd"
+}
+
+#Solicitar producto en orden
+{
+    "quantity": 200,
+    "order": 1,
+    "item": 1
+}
+
+#Proveer orden
+{
+    "status": "INPROGRESS",
+    "external_shipment_id": "02455221",
+    "external_shipment_company": "UNA COMPAÑIA X",
+    "quantity": 100,
+    "order": 1,
+    "supplier": 1, //USER
+    "item": 1
+}

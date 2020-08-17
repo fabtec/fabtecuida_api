@@ -7,8 +7,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, viewsets
 from .models import Item, Entity, Order, OrderRequestedItem, OrderSuppliedItem, SupplierInventory
-from .serializers import ItemSerializer, EntitySerializer, OrderSerializer, CreateOrderSerializer, OrderRequestedItemSerializer, CreateOrderRequestedItemSerializer, OrderSuppliedItemSerializer, SupplierInventorySerializer, UserSerializer, BaseOrderSerializer
+from .serializers import SupplierInventorySerializer, ItemSerializer, EntitySerializer, OrderSerializer, CreateOrderSerializer, OrderRequestedItemSerializer, CreateOrderRequestedItemSerializer, OrderSuppliedItemSerializer, SupplierInventorySerializer, UserSerializer, BaseOrderSerializer
 from django.contrib.auth.models import User
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 class UserViewSet(viewsets.ModelViewSet):
 	queryset         = User.objects.all()
@@ -22,6 +24,12 @@ class ItemViewSet(viewsets.ModelViewSet):
 	queryset         = Item.objects.all()
 	serializer_class = ItemSerializer
 
+class SupplierInventoryViewSet(viewsets.ModelViewSet):
+	queryset         = SupplierInventory.objects.all()
+	serializer_class = SupplierInventorySerializer
+	filter_backends  = [DjangoFilterBackend]
+	filterset_fields = ['item']
+
 class OrderViewSet(APIView):
 	# authentication_classes = [JWTAuthentication]
 	# permission_classes = [IsAuthenticated]
@@ -33,30 +41,40 @@ class OrderViewSet(APIView):
 
 		else:
 			orders = Order.objects.all()
-			serializer = BaseOrderSerializer(orders, many=True)
+			serializer = OrderSerializer(orders, many=True)
 
 			if('entity' in request.GET):
-				orders = orders.filter(entity__id=request.GET['entity'] )
+				if(request.GET['entity']!=""):
+					orders = orders.filter(entity__id=request.GET['entity'] )
+
+				if('status' in request.GET):
+					if(request.GET['status']!=""):
+						orders = orders.filter(status=request.GET['status'] )
+						
 
 				serializer = OrderSerializer(orders, many=True)
 
-			if('type_order' in request.GET):
+			if('type' in request.GET):
+				if(request.GET['type']!=""):
+					if(request.GET['type']=="REQUESTED"):
+						orders = orders.exclude(order_requested__pk__isnull=True)
+						# if('status' in request.GET):
+						# 	if(request.GET['status']!=""):
+						# 		orders = orders.filter(order_requested__status=request.GET['status'] )
 
-				if(request.GET['type_order']=="REQUESTED"):
-					orders = orders.exclude(order_requested__pk__isnull=True)
-					if('status' in request.GET):
-						orders = orders.filter(order_requested__status=request.GET['status'] )
+						if('quantity' in request.GET):
+							if(request.GET['quantity']!=""):
+								orders = orders.filter(order_requested__quantity__gte=request.GET['quantity'] )
 
-					if('quantity' in request.GET):
-						orders = orders.filter(order_requested__quantity__gte=request.GET['quantity'] )
-
-				elif(request.GET['type_order']=="SUPPLIED"):
-					orders = orders.exclude(order_supplied__pk__isnull=True)
-					if('status' in request.GET):
-						orders = orders.filter(order_supplied__status=request.GET['status'] )
-						
-					if('quantity' in request.GET):
-						orders = orders.filter(order_supplied__quantity__gte=request.GET['quantity'] )	
+					elif(request.GET['type']=="SUPPLIED"):
+						orders = orders.exclude(order_supplied__pk__isnull=True)
+						# if('status' in request.GET):
+						# 	if(request.GET['status']!=""):
+						# 		orders = orders.filter(order_supplied__status=request.GET['status'] )
+							
+						if('quantity' in request.GET):
+							if(request.GET['quantity']!=""):
+								orders = orders.filter(order_supplied__quantity__gte=request.GET['quantity'] )	
 			
 				serializer = OrderSerializer(orders, many=True)
 				
@@ -74,7 +92,7 @@ class OrderViewSet(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	def put(self, request, *args, **kwargs):
-		order = self.get_object(self.POST.get['pk'])
+		order = self.get_object(kwargs['pk'])
 		serializer = CreateOrderSerializer(order, data=request.data)
 		if serializer.is_valid():
 			serializer.save()
@@ -129,9 +147,9 @@ class OrderSuppliedItemViewSet(viewsets.ModelViewSet):
 	queryset         = OrderSuppliedItem.objects.all()
 	serializer_class = OrderSuppliedItemSerializer
 
-class SupplierInventoryViewSet(viewsets.ModelViewSet):
+""" class SupplierInventoryViewSet(viewsets.ModelViewSet):
 	queryset         = SupplierInventory.objects.all()
-	serializer_class = SupplierInventorySerializer
+	serializer_class = SupplierInventorySerializer """
 
 #################### CUSTOM API ####################
 

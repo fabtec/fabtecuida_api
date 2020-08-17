@@ -5,7 +5,32 @@ from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from .models import User, Entity, Item, Order
 
-def create_base_data():
+
+def create_enity_from_csv():
+	user = User.objects.create_user(username='test', password='test')    
+
+	csv_filepathname="/D:/Documentos/Desarrollo/fabtecuida/django/fabtecuida_api/excel/entidades.csv"
+	your_djangoproject_home="/D:/Documentos/Desarrollo/fabtecuida/fabtecuida_api/django"
+
+	sys.path.append(your_djangoproject_home)
+	os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
+	dataReader = csv.reader(open(csv_filepathname, 'r', encoding="utf-8"), delimiter=';', quotechar='"')
+	x = 0
+	for row in dataReader:
+		x = x + 1
+		if x > 1:
+
+			entity = Entity.objects.create(
+				name= row[0],
+				location= row[1],
+				manager= row[2]
+			)
+
+            print("GUARDADO %s" % entity)
+
+
+""" def create_base_data():
     Entity.objects.create(name='clinica santa maria')
     Item.objects.create(name='mascara n95')
 
@@ -49,3 +74,4 @@ class OrdersTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Order.objects.count(), 1)
         self.assertEqual(Order.objects.get().entity.id, 1)
+ """
