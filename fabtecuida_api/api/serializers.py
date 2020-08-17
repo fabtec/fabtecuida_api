@@ -42,6 +42,7 @@ class BaseOrderRequestedItemSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = OrderRequestedItem
 		fields = [
+			'id',
 			'item',
 			'status',
 			'quantity',

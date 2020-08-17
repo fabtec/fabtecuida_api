@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
 	TokenObtainPairView, TokenRefreshView, TokenVerifyView
 )
 # from .views import EntityAPIView, ItemAPIView, OrderAPIView
-from .views import UserViewSet, EntityViewSet, ItemViewSet, OrderViewSet, SupplierInventoryViewSet, OrderRequestedItemViewSet, OrderSuppliedItemViewSet, SupplierInventoryViewSet
+from .views import UserViewSet, EntityViewSet, ItemViewSet, OrderViewSet, SupplierInventoryViewSet, OrderRequestedItemViewSet, OrderSuppliedItemViewSet, SupplierInventoryViewSet, SuppliedItemViewSet
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -33,5 +33,6 @@ urlpatterns = [
 	path('api/orders-requested/<int:pk>/', OrderRequestedItemViewSet.as_view(), name='orders-requested-detail'),
 	path('api/orders/', OrderViewSet.as_view(), name='orders-list'),
 	path('api/orders/<int:pk>/', OrderViewSet.as_view(), name='orders-detail'),
-	#path('api/supplier-inventory/<int:item>/', OrderViewSet.as_view(), name='orders-detail'),
+	path('api/supplied-item/', SuppliedItemViewSet.as_view(), name='supplied-item'),
+
 ]

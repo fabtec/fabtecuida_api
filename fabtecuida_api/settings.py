@@ -64,6 +64,11 @@ REST_FRAMEWORK = {
 # TODO use https://github.com/adamchainz/django-cors-headers#cors_origin_whitelist instead
 CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
+
 MIDDLEWARE = [
     # Simplified static file serving - needed for dokku env
     # https://warehouse.python.org/project/whitenoise/
