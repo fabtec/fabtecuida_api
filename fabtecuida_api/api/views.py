@@ -30,10 +30,14 @@ class SupplierInventoryViewSet(viewsets.ModelViewSet):
 	filter_backends  = [DjangoFilterBackend]
 	filterset_fields = ['item']
 
-class OrderViewSet(APIView):
-	# authentication_classes = [JWTAuthentication]
-	# permission_classes = [IsAuthenticated]
 
+class OrderSuppliedItemViewSet(viewsets.ModelViewSet):
+	queryset         = OrderSuppliedItem.objects.all()
+	serializer_class = OrderSuppliedItemSerializer
+
+#################### CUSTOM API ####################
+
+class OrderViewSet(APIView):
 	def get(self, request, *args, **kwargs):
 		if 'pk' in kwargs:
 			orders = Order.objects.get(pk=int(kwargs['pk']))
@@ -58,9 +62,6 @@ class OrderViewSet(APIView):
 				if(request.GET['type']!=""):
 					if(request.GET['type']=="REQUESTED"):
 						orders = orders.exclude(order_requested__pk__isnull=True)
-						# if('status' in request.GET):
-						# 	if(request.GET['status']!=""):
-						# 		orders = orders.filter(order_requested__status=request.GET['status'] )
 
 						if('quantity' in request.GET):
 							if(request.GET['quantity']!=""):
@@ -68,9 +69,6 @@ class OrderViewSet(APIView):
 
 					elif(request.GET['type']=="SUPPLIED"):
 						orders = orders.exclude(order_supplied__pk__isnull=True)
-						# if('status' in request.GET):
-						# 	if(request.GET['status']!=""):
-						# 		orders = orders.filter(order_supplied__status=request.GET['status'] )
 							
 						if('quantity' in request.GET):
 							if(request.GET['quantity']!=""):
@@ -82,9 +80,6 @@ class OrderViewSet(APIView):
 		return Response(serializer.data)
 
 	def post(self, request):
-		# data = request.data
-		#data['requester'] = request.user.id
-
 		serializer = CreateOrderSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save()
@@ -99,19 +94,8 @@ class OrderViewSet(APIView):
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-	# def delete(self, request, *args, **kwargs):
-	# 	order = self.get_object(self.POST.get['pk'])
-	# 	order.delete()
-	# 	return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# class OrderRequestedItemViewSet(viewsets.ModelViewSet):
-# 	queryset         = OrderRequestedItem.objects.all()
-# 	serializer_class = OrderRequestedItemSerializer
 
 class OrderRequestedItemViewSet(APIView):
-	# authentication_classes = [JWTAuthentication]
-	# permission_classes = [IsAuthenticated]
 
 	def get(self, request):
 		orders = OrderRequestedItem.objects.all()
@@ -119,27 +103,11 @@ class OrderRequestedItemViewSet(APIView):
 		return Response(serializer.data)
 
 	def post(self, request):
-		# data = request.data
-		#data['requester'] = request.user.id
-
 		serializer = CreateOrderRequestedItemSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-	# def put(self, request, *args, **kwargs):
-	# 	order = self.get_object(self.POST.get['pk'])
-	#	serializer = CreateOrderRequestedItemSerializer(order, data=request.data)
-	# 	if serializer.is_valid():
-	# 		serializer.save()
-	# 		return Response(serializer.data)
-	# 	return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-	# def delete(self, request, *args, **kwargs):
-	# 	order = self.get_object(self.POST.get['pk'])
-	# 	order.delete()
-	# 	return Response(status=status.HTTP_204_NO_CONTENT)
 
 class SuppliedItemViewSet(APIView):
 	authentication_classes = [JWTAuthentication]
@@ -147,42 +115,41 @@ class SuppliedItemViewSet(APIView):
 	
 	def post(self, request):
 		data = request.data
-		#data['requester'] = request.user.id
-		print(data)
+		
 		if "itemSelected" in data and "requested_item" in data:
 			requested_item = OrderRequestedItem.objects.get(pk=data['requested_item'])
-			print(requested_item.order)
-			print(requested_item.quantity)
-			print(requested_item.item)
 
 			for item_selected in data['itemSelected']:
 				item_inventory = SupplierInventory.objects.get(pk=item_selected)
-				print(item_inventory.supplier)
-				print(item_inventory.quantity)
-				print(item_inventory.item)
+				supplied_quantity = item_inventory.quantity - requested_item.quantity
+				
+				if supplied_quantity > 0:
+					item_inventory.quantity = item_inventory.quantity - requested_item.quantity
+					item_inventory.save()
+					requested_item.quantity = 0
+					requested_item.status = "INPROGRESS"
+				elif supplied_quantity == 0:
+					requested_item.quantity = 0
+					requested_item.status = "INPROGRESS"
+					item_inventory.delete()
+				else:
+					requested_item.quantity = requested_item.quantity - item_inventory.quantity
+					requested_item.status = "PENDING"
+					item_inventory.delete()
 
-				supplied_item = OrderSuppliedItem.objects.create(
+				OrderSuppliedItem.objects.create(
 					order = requested_item.order,
 					supplier = item_inventory.supplier,
 					item = requested_item.item,
 					status = "INPROGRESS",
-					quantity = requested_item.quantity - item_inventory.quantity
+					quantity = supplied_quantity
 				)
+
+				requested_item.save()
 				
-				item_inventory.delete()
-				print(supplied_item)
-				return Response({'response': 'Guardado Correctamente'}, status=status.HTTP_201_CREATED)
+			return Response({'response': 'Guardado Correctamente'}, status=status.HTTP_201_CREATED)
 		else:
 			return Response({'response': 'itemSelected & requested_item required'}, status=status.HTTP_400_BAD_REQUEST)
-		
-
-class OrderSuppliedItemViewSet(viewsets.ModelViewSet):
-	queryset         = OrderSuppliedItem.objects.all()
-	serializer_class = OrderSuppliedItemSerializer
-
-
-#################### CUSTOM API ####################
-
 
 class ItemAPIView(APIView):
 	authentication_classes = [JWTAuthentication]
