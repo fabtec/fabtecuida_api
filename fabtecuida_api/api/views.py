@@ -11,6 +11,8 @@ from .serializers import SupplierInventorySerializer, ItemSerializer, EntitySeri
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 class UserViewSet(viewsets.ModelViewSet):
 	queryset         = User.objects.all()
@@ -196,3 +198,19 @@ class OrderAPIView(APIView):
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#REVISANDO DESPUÉS DE GUARDAR
+@receiver(post_save, sender=OrderSuppliedItem)
+def post_save_order_supplied_item(sender, instance, **kwargs):
+	count_pending = 0
+	for	supplied_item_tmp in instance.order.getOrdersSupplied():
+		if supplied_item_tmp.status != "DONE":
+			count_pending =  count_pending + 1
+	
+	if count_pending == 0:
+		instance.order.status = "DONE"
+		instance.order.save()
+
+		for	requested_item_tmp in instance.order.getOrdersRequested():
+			requested_item_tmp.status = "DONE"
+			requested_item_tmp.save()
