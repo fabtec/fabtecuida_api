@@ -51,9 +51,9 @@ class OrderViewSet(APIView):
 				if(request.GET['entity']!=""):
 					orders = orders.filter(entity__id=request.GET['entity'] )
 
-				if('status' in request.GET):
-					if(request.GET['status']!=""):
-						orders = orders.filter(status=request.GET['status'] )
+			if('status' in request.GET):
+				if(request.GET['status']!=""):
+					orders = orders.filter(status=request.GET['status'] )
 						
 
 				serializer = OrderSerializer(orders, many=True)
@@ -146,6 +146,20 @@ class SuppliedItemViewSet(APIView):
 				)
 
 				requested_item.save()
+			
+			#si no hay mas items en PENDING, PASAR ORDEN A INPROGRESS
+
+			#recorrer la orden
+			#recorrer todos los items en busca de un status PENDING
+			#Si No existe ningun pending cambiar status de orden a INPROGRESS
+			count_pending = 0
+			for	requested_item_tmp in requested_item.order.getOrdersRequested():
+				if requested_item_tmp.status == "PENDING":
+					count_pending =  count_pending + 1
+			
+			if count_pending == 0:
+				requested_item.order.status = "INPROGRESS"
+				requested_item.order.save()
 				
 			return Response({'response': 'Guardado Correctamente'}, status=status.HTTP_201_CREATED)
 		else:
