@@ -52,11 +52,13 @@ class BaseOrderRequestedItemSerializer(serializers.ModelSerializer):
 
 class BaseOrderSuppliedItemSerializer(serializers.ModelSerializer):
 	item  = ItemSerializer()
+	supplier = EntitySerializer()
 	date  = serializers.DateTimeField(source='created_at')
 	class Meta:
 		model = OrderRequestedItem
 		fields = [
 			'id',
+			'supplier',
 			'item',
 			'status',
 			'quantity',

@@ -124,7 +124,7 @@ class SuppliedItemViewSet(APIView):
 			for item_selected in data['itemSelected']:
 				item_inventory = SupplierInventory.objects.get(pk=item_selected)
 				supplied_quantity = item_inventory.quantity - requested_item.quantity
-				
+				item_supplied = requested_item.quantity
 				if supplied_quantity > 0:
 					item_inventory.quantity = item_inventory.quantity - requested_item.quantity
 					item_inventory.save()
@@ -135,6 +135,7 @@ class SuppliedItemViewSet(APIView):
 					requested_item.status = "INPROGRESS"
 					item_inventory.delete()
 				else:
+					item_supplied = item_inventory.quantity
 					requested_item.quantity = requested_item.quantity - item_inventory.quantity
 					requested_item.status = "PENDING"
 					item_inventory.delete()
@@ -144,7 +145,7 @@ class SuppliedItemViewSet(APIView):
 					supplier = item_inventory.supplier,
 					item = requested_item.item,
 					status = "INPROGRESS",
-					quantity = supplied_quantity
+					quantity = item_supplied
 				)
 
 				requested_item.save()
