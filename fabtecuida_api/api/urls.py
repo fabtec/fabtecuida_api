@@ -36,6 +36,6 @@ urlpatterns = [
 	path('api/supplied-item/', SuppliedItemViewSet.as_view(), name='supplied-item'),
 	path('api/create-orders/', CreateOrderAdminViewSet.as_view(), name='create-order'),
 
-	path('api/supplier-inventory/', SupplierInventoryViewSet.as_view(), name='supplier-inventory'),
-
+	path('api/supplier-inventory/', SupplierInventoryViewSet.as_view(), name='supplier-inventory')
+	
 ]
