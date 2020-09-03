@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import (
 	TokenObtainPairView, TokenRefreshView, TokenVerifyView
 )
 # from .views import EntityAPIView, ItemAPIView, OrderAPIView
-from .views import UserViewSet, EntityViewSet, ItemViewSet, OrderViewSet, SupplierInventoryViewSet, OrderRequestedItemViewSet, OrderSuppliedItemViewSet, SupplierInventoryViewSet, SuppliedItemViewSet
+from .views import UserViewSet, EntityViewSet, ItemViewSet, OrderViewSet, SupplierInventoryViewSet, OrderRequestedItemViewSet, OrderSuppliedItemViewSet, SupplierInventoryViewSet, SuppliedItemViewSet, CreateOrderAdminViewSet
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -15,7 +15,7 @@ router.register(r'api/items', ItemViewSet)
 # router.register(r'api/orders-requested',OrderRequestedItemViewSet)
 router.register(r'api/orders-supplied',OrderSuppliedItemViewSet)
 router.register(r'api/users',UserViewSet)
-router.register(r'api/supplier-inventory',SupplierInventoryViewSet)
+# router.register(r'api/supplier-inventory',SupplierInventoryViewSet)
 
 
 
@@ -34,5 +34,8 @@ urlpatterns = [
 	path('api/orders/', OrderViewSet.as_view(), name='orders-list'),
 	path('api/orders/<int:pk>/', OrderViewSet.as_view(), name='orders-detail'),
 	path('api/supplied-item/', SuppliedItemViewSet.as_view(), name='supplied-item'),
+	path('api/create-orders/', CreateOrderAdminViewSet.as_view(), name='create-order'),
+
+	path('api/supplier-inventory/', SupplierInventoryViewSet.as_view(), name='supplier-inventory'),
 
 ]

@@ -7,7 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, viewsets
 from .models import Item, Entity, Order, OrderRequestedItem, OrderSuppliedItem, SupplierInventory
-from .serializers import SupplierInventorySerializer, ItemSerializer, EntitySerializer, OrderSerializer, CreateOrderSerializer, OrderRequestedItemSerializer, CreateOrderRequestedItemSerializer, OrderSuppliedItemSerializer, SupplierInventorySerializer, UserSerializer, BaseOrderSerializer
+from .serializers import SupplierInventorySerializer, SupplierInventoryBasicSerializer, ItemSerializer, EntitySerializer, OrderSerializer, CreateOrderSerializer, OrderRequestedItemSerializer, CreateOrderRequestedItemSerializer, OrderSuppliedItemSerializer, SupplierInventorySerializer, UserSerializer, BaseOrderSerializer
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -26,11 +26,26 @@ class ItemViewSet(viewsets.ModelViewSet):
 	queryset         = Item.objects.all()
 	serializer_class = ItemSerializer
 
-class SupplierInventoryViewSet(viewsets.ModelViewSet):
-	queryset         = SupplierInventory.objects.all()
-	serializer_class = SupplierInventorySerializer
-	filter_backends  = [DjangoFilterBackend]
-	filterset_fields = ['item']
+class SupplierInventoryViewSet(APIView):
+	# queryset         = SupplierInventory.objects.all()
+	# serializer_class = SupplierInventorySerializer
+	# filter_backends  = [DjangoFilterBackend]
+	# filterset_fields = ['item']
+	def get(self, request):
+		get_data = request.query_params
+		if 'item' in get_data:
+			supplier = SupplierInventory.objects.filter(item=get_data['item'])
+		else:
+			supplier = SupplierInventory.objects.all()
+		serializer = SupplierInventorySerializer(supplier, many=True)
+		return Response(serializer.data)
+
+	def post(self, request):
+		serializer = SupplierInventoryBasicSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderSuppliedItemViewSet(viewsets.ModelViewSet):
@@ -65,16 +80,16 @@ class OrderViewSet(APIView):
 					if(request.GET['type']=="REQUESTED"):
 						orders = orders.exclude(order_requested__pk__isnull=True)
 
-						if('quantity' in request.GET):
-							if(request.GET['quantity']!=""):
-								orders = orders.filter(order_requested__quantity__gte=request.GET['quantity'] )
+					if('quantity' in request.GET):
+						if(request.GET['quantity']!=""):
+							orders = orders.filter(order_requested__quantity__gte=request.GET['quantity'] )
 
-					elif(request.GET['type']=="SUPPLIED"):
-						orders = orders.exclude(order_supplied__pk__isnull=True)
-							
-						if('quantity' in request.GET):
-							if(request.GET['quantity']!=""):
-								orders = orders.filter(order_supplied__quantity__gte=request.GET['quantity'] )	
+				elif(request.GET['type']=="SUPPLIED"):
+					orders = orders.exclude(order_supplied__pk__isnull=True)
+						
+					if('quantity' in request.GET):
+						if(request.GET['quantity']!=""):
+							orders = orders.filter(order_supplied__quantity__gte=request.GET['quantity'] )	
 			
 				serializer = OrderSerializer(orders, many=True)
 				
@@ -199,6 +214,52 @@ class OrderAPIView(APIView):
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CreateOrderAdminViewSet(APIView):
+
+	def post(self, request):
+		form = request.data
+		
+		order = {
+			"manager":"",
+			"entity":"",
+			"requested_item":[]
+		}
+
+		y = 0
+
+		for x in range(0,len(form)):
+			if(form[x]['name']=='manager'):
+				manager = User.objects.get(pk=form[x]['value'])
+				order['manager'] = manager
+
+			if(form[x]['name']=='entity'):
+				entity = Entity.objects.get(pk=form[x]['value'])
+				order['entity']= entity
+
+			requested_item = {}
+			
+			if(form[x]['name']==("item_"+str(y))):
+				item = Item.objects.get(pk=form[x]['value'])
+				requested_item['quantity'] = form[x+1]['value']
+				requested_item['item'] = item
+				y = y+1
+
+				order['requested_item'].append(requested_item)			
+		
+		order_created = Order.objects.create(
+			requester=order['manager'],
+			entity=order['entity']
+		)	
+		
+		for	requested_item_loop in order['requested_item']:
+			OrderRequestedItem.objects.create(
+				order = order_created,
+				item = requested_item_loop['item'],
+				quantity = requested_item_loop['quantity']
+			)
+			
+		return Response({"response": "Guardado Correctamente"}, status=status.HTTP_201_CREATED)
 
 #REVISANDO DESPUÉS DE GUARDAR
 @receiver(post_save, sender=OrderSuppliedItem)

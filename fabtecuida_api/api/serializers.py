@@ -142,3 +142,8 @@ class SupplierInventorySerializer(serializers.ModelSerializer):
 	class Meta:
 		model = SupplierInventory
 		fields = '__all__'
+
+class SupplierInventoryBasicSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = SupplierInventory
+		fields = '__all__'
