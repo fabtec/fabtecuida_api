@@ -26,7 +26,7 @@ SECRET_KEY = '%k50o54!)s+n!#a1yc1-grh7l7+ahhm0xy5oh(#f7&129qtl6z'
 DEBUG = True
 
 # TODO check right way of setup - needed for dokku env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '52.91.182.173', '142.93.11.231']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '52.91.182.173', '142.93.11.231', 'api.fabtecuida.cl']
 
 
 # Application definition
