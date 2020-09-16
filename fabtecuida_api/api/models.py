@@ -15,7 +15,7 @@ class Item(models.Model):
 
 class Entity(models.Model):
     name       = models.CharField(max_length=255)
-    location   = LocationField(zoom=7, default=Point(0,0))
+    location   = LocationField(based_fields=['address'], zoom=7, default=Point(0,0))
     manager    = models.ManyToManyField(User)
     address    = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
