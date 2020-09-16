@@ -33,6 +33,7 @@ class Order(models.Model):
     requester  = models.ForeignKey(User, on_delete=models.CASCADE)
     entity     = models.ForeignKey(Entity, on_delete=models.CASCADE)
     status     = models.CharField(max_length=255, default="PENDING") #PENDING - DONE - INPROGRESS (POR FRONT)
+    finish_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -47,7 +48,6 @@ class OrderRequestedItem(models.Model):
     item        = models.ForeignKey(Item, on_delete=models.CASCADE)
     status      = models.CharField(max_length=255, default="PENDING") #PENDING - DONE - INPROGRESS (POR FRONT)
     quantity    = models.IntegerField()
-    finish_date = models.DateField(null=True, blank=True)
     created_at  = models.DateTimeField(auto_now_add=True)
     updated_at  = models.DateTimeField(auto_now=True)
 
