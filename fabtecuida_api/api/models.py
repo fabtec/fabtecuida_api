@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.gis.geos import Point
+from location_field.models.spatial import LocationField
 
 class Item(models.Model):
     name        = models.CharField(max_length=255)
@@ -13,8 +15,9 @@ class Item(models.Model):
 
 class Entity(models.Model):
     name       = models.CharField(max_length=255)
-    location   = models.CharField(max_length=512)
+    location   = LocationField(zoom=7, default=Point(0,0))
     manager    = models.ManyToManyField(User)
+    address    = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -40,12 +43,13 @@ class Order(models.Model):
         return OrderSuppliedItem.objects.filter(order=self)
 
 class OrderRequestedItem(models.Model):
-    order      = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_requested')
-    item       = models.ForeignKey(Item, on_delete=models.CASCADE)
-    status     = models.CharField(max_length=255, default="PENDING") #PENDING - DONE - INPROGRESS (POR FRONT)
-    quantity   = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    order       = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_requested')
+    item        = models.ForeignKey(Item, on_delete=models.CASCADE)
+    status      = models.CharField(max_length=255, default="PENDING") #PENDING - DONE - INPROGRESS (POR FRONT)
+    quantity    = models.IntegerField()
+    finish_date = models.DateField(null=True, blank=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+    updated_at  = models.DateTimeField(auto_now=True)
 
 class OrderSuppliedItem(models.Model):
     order                     = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_supplied')
