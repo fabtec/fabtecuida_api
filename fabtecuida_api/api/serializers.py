@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Item, Entity, Order, OrderRequestedItem, OrderSuppliedItem, SupplierInventory
 from django.contrib.auth.models import User
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -20,9 +21,10 @@ class ItemSerializer(serializers.ModelSerializer):
 		model = Item
 		fields = ['id', 'name', 'description']
 
-class EntitySerializer(serializers.ModelSerializer):
+class EntitySerializer(GeoFeatureModelSerializer):
 	class Meta:
 		model = Entity
+		geo_field = "location"
 		fields = ['id', 'name', 'location', 'manager']
 
 #FILTRO DE ORDENES 1)ENTIDADES__ID, 2)STATUS, 3)QUANTITY lt210 y gt (>=), 4)TIPO

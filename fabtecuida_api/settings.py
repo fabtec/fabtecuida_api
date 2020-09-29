@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'fabtecuida_api.api',
+    'rest_framework_gis',
+	'location_field.apps.DefaultConfig',
 ]
 
 REST_FRAMEWORK = {
@@ -66,7 +68,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "http://api.fabtecuida.cl",
+    "https://fabtecuida.cl",
 ]
 
 MIDDLEWARE = [
@@ -117,8 +121,12 @@ else:
     # local env
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'fabtecuida',
+            'USER': 'fabtec',
+            'PASSWORD': 'fabtec',
+            'HOST': '127.0.0.1',
+            'PORT': '5432'
         }
     }
 
@@ -167,3 +175,37 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+
+LOCATION_FIELD_PATH = STATIC_URL + 'location_field'
+
+LOCATION_FIELD = {
+	'map.provider': 'openstreetmap',
+	'map.zoom': 18,
+
+	'search.provider': 'google',
+	'search.suffix': '',
+
+	# Google
+	'provider.google.api': '//maps.google.com/maps/api/js',
+	'provider.google.api_key': 'AIzaSyAAHXBgqCfhM-eljZ9YsMifSgo0WXO8JYQ',
+	'provider.google.map_type': 'ROADMAP',
+
+	# Mapbox
+	'provider.mapbox.access_token': 'sk.eyJ1IjoibXVobGVuYnJvY2siLCJhIjoiY2oxYTQ0dzcwMDlkMDJxbzd4a3I5ZTUxMSJ9.ZL0fltW9hCJv_GMgUeoa5Q',
+	'provider.mapbox.max_zoom': 18,
+	'provider.mapbox.id': 'mapbox.mapbox-streets-v7',
+
+	# OpenStreetMap
+	'provider.openstreetmap.max_zoom': 20,
+    'provider.openstreetmap.api': '//nominatim.openstreetmap.org/',
+
+	# misc
+	'resources.root_path': LOCATION_FIELD_PATH,
+	'resources.media': {
+		'js': [
+			LOCATION_FIELD_PATH + '/js/jquery.livequery.js',
+			LOCATION_FIELD_PATH + '/js/form.js',
+		],
+	},
+}
