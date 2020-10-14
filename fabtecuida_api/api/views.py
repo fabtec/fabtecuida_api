@@ -13,6 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from .userViews import GetUserViewSet
 
 class UserViewSet(viewsets.ModelViewSet):
 	queryset         = User.objects.all()
