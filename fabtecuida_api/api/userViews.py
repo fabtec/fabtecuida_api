@@ -6,7 +6,6 @@ from rest_framework_simplejwt import authentication
 class GetUserViewSet(APIView):
 
 	def post(self, request):
-		print(request.user)
 		response = {
             "first_name": request.user.first_name,
             "last_name": request.user.last_name,

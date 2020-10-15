@@ -25,7 +25,7 @@ class EntitySerializer(GeoFeatureModelSerializer):
 	class Meta:
 		model = Entity
 		geo_field = "location"
-		fields = ['id', 'name', 'location', 'manager']
+		fields = ['id', 'name', 'address','location', 'manager']
 
 #FILTRO DE ORDENES 1)ENTIDADES__ID, 2)STATUS, 3)QUANTITY lt210 y gt (>=), 4)TIPO
 #localhost:8000/api/orders/?entity=1203&status="INPROGRESS"&quantity=lt210&type="SUPPLIED"

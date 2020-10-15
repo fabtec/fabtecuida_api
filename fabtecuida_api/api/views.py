@@ -20,7 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
 
 class EntityViewSet(viewsets.ModelViewSet):
-	queryset         = Entity.objects.all()
+	queryset         = Entity.objects.all().order_by('-created_at')
 	serializer_class = EntitySerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
