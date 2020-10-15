@@ -7,7 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, viewsets
 from .models import Item, Entity, Order, OrderRequestedItem, OrderSuppliedItem, SupplierInventory
-from .serializers import SupplierInventorySerializer, SupplierInventoryBasicSerializer, ItemSerializer, EntitySerializer, OrderSerializer, CreateOrderSerializer, OrderRequestedItemSerializer, CreateOrderRequestedItemSerializer, OrderSuppliedItemSerializer, SupplierInventorySerializer, UserSerializer, BaseOrderSerializer
+from .serializers import EntityFullSerializer, SupplierInventorySerializer, SupplierInventoryBasicSerializer, ItemSerializer, EntitySerializer, OrderSerializer, CreateOrderSerializer, OrderRequestedItemSerializer, CreateOrderRequestedItemSerializer, OrderSuppliedItemSerializer, SupplierInventorySerializer, UserSerializer, BaseOrderSerializer
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -19,9 +19,21 @@ class UserViewSet(viewsets.ModelViewSet):
 	queryset         = User.objects.all()
 	serializer_class = UserSerializer
 
-class EntityViewSet(viewsets.ModelViewSet):
-	queryset         = Entity.objects.all().order_by('-created_at')
-	serializer_class = EntitySerializer
+class EntityViewSet(APIView):
+	# queryset         = Entity.objects.all().order_by('-created_at')
+	# serializer_class = EntitySerializer
+	
+	def post(self, request):
+		serializer = EntitySerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	def get(self, request):
+		supplier = Entity.objects.all()
+		serializer = EntityFullSerializer(supplier, many=True)
+		return Response(serializer.data)
 
 class ItemViewSet(viewsets.ModelViewSet):
 	queryset         = Item.objects.all()

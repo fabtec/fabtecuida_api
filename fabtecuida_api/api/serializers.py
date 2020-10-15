@@ -20,6 +20,13 @@ class ItemSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Item
 		fields = ['id', 'name', 'description']
+	
+class EntityFullSerializer(GeoFeatureModelSerializer):
+	manager  = UserSerializer(many=True, read_only=True)
+	class Meta:
+		model = Entity
+		geo_field = "location"
+		fields = ['id', 'name', 'address','location', 'manager']
 
 class EntitySerializer(GeoFeatureModelSerializer):
 	class Meta:

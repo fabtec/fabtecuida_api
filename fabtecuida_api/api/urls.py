@@ -8,7 +8,7 @@ from . import views
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'api/entities', views.EntityViewSet)
+# router.register(r'api/entities', views.EntityViewSet)
 router.register(r'api/items', views.ItemViewSet)
 # router.register(r'api/orders', OrderViewSet)
 #router.register(r'api/suppliers',SupplierInventoryViewSet)
@@ -35,7 +35,7 @@ urlpatterns = [
 	path('api/orders/<int:pk>/', views.OrderViewSet.as_view(), name='orders-detail'),
 	path('api/supplied-item/', views.SuppliedItemViewSet.as_view(), name='supplied-item'),
 	path('api/create-orders/', views.CreateOrderAdminViewSet.as_view(), name='create-order'),
-
+	path('api/entities/', views.EntityViewSet.as_view(), name='entities'),
 	path('api/supplier-inventory/', views.SupplierInventoryViewSet.as_view(), name='supplier-inventory')
 	
 ]
